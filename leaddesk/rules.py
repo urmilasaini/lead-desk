@@ -29,7 +29,13 @@ HIGH_VALUE_LAKHS = 300                               # 3 Cr+ never drops below W
 
 # Re-scoring after the first inquiry (activity over time)
 SILENCE_PENALTY = [(14, -25), (7, -15), (3, -5)]     # days since customer last replied -> points
-EVENT_POINTS = {"site_visit_done": 10, "negotiating": 10, "requested_documents": 5}
+EVENT_POINTS = {
+    "connected": 3,
+    "visit_booked": 5,
+    "site_visit_done": 10,
+    "negotiating": 10,
+    "requested_documents": 5,
+}
 # -------------------------------------------------
 
 _MARKET = json.loads((Path(__file__).parent / "market.json").read_text(encoding="utf-8"))

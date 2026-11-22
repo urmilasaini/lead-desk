@@ -81,6 +81,13 @@ class ApiFlowTests(unittest.TestCase):
         self.assertIsNone(lead["override"])
         self.assertEqual(lead["priority"], "Hot")
 
+    def test_manual_priority_corrects_an_out_of_service_extraction(self):
+        lid = self.c.post("/api/leads", json={**FORM, "message": "Looking in Mumbai"}).get_json()["lead"]["id"]
+        corrected = self.c.post(f"/api/leads/{lid}/override", json={"to": "Cold", "reason": "We do serve this lead"}).get_json()["lead"]
+        self.assertEqual((corrected["score"], corrected["priority"]), (20, "Cold"))
+        logged = self.c.post(f"/api/leads/{lid}/calls", json={"outcome": "connected", "notes": "Interested"}).get_json()
+        self.assertEqual(logged["call"]["score_after"], 23)
+
     def test_reply_replace_mark_responded_phone_delete(self):
         lid = self.c.post("/api/leads", json=FORM).get_json()["lead"]["id"]
         lead = self.c.post(f"/api/leads/{lid}/reply", json={"text": "New wording"}).get_json()["lead"]

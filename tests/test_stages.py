@@ -20,9 +20,21 @@ class StageTests(unittest.TestCase):
         self.assertEqual(self.stage(), "new")
 
     def test_manual_move_and_validation(self):
-        self.assertEqual(self.c.post(f"/api/leads/{self.lid}/stage", json={"stage": "negotiation"}).get_json()["lead"]["stage"], "negotiation")
+        lid = self.c.post("/api/leads", json={**FORM, "name": "Low-score lead", "message": "price? [cold]"}).get_json()["lead"]["id"]
+        before = self.c.get(f"/api/leads/{lid}").get_json()["lead"]["score"]
+        lead = self.c.post(f"/api/leads/{lid}/stage", json={"stage": "negotiation"}).get_json()["lead"]
+        self.assertEqual(lead["stage"], "negotiation")
+        self.assertEqual(lead["score"], before + 10, "manual progress updates the live score")
         self.assertEqual(self.c.post(f"/api/leads/{self.lid}/stage", json={"stage": "flying"}).status_code, 400)
         self.assertEqual(self.c.post("/api/leads/nope/stage", json={"stage": "new"}).status_code, 404)
+
+    def test_connected_call_updates_score(self):
+        lid = self.c.post("/api/leads", json={**FORM, "name": "Low-score lead", "message": "price? [cold]"}).get_json()["lead"]["id"]
+        self.ai.tweak["call_log"] = lambda out: {**out, "signal_updates": {}}
+        before = self.c.get(f"/api/leads/{lid}").get_json()["lead"]["score"]
+        res = self.c.post(f"/api/leads/{lid}/calls", json={"outcome": "connected", "notes": "Interested"}).get_json()
+        self.assertEqual(res["call"]["score_after"], before + 3)
+        self.assertEqual(res["lead"]["breakdown"]["activity"], 3)
 
     def test_calls_advance_stage_forward(self):
         self.call("no_answer")

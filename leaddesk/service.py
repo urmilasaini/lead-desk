@@ -17,7 +17,7 @@ from datetime import datetime, timezone
 
 from . import cache, prompts, safety
 from .ai import AIError, call_json, primary_model
-from .rules import rescore
+from .rules import EVENT_POINTS, SILENCE_PENALTY, rescore
 from .store import Append, LeadGone
 
 log = logging.getLogger("leaddesk.service")
@@ -42,13 +42,22 @@ ANALYSIS_KEYS = ["summary", "intent", "key_requirements", "objections", "missing
                  "next_action", "call_talking_points", "suggested_response"]
 # Call outcome -> fact changes, rescore events and pipeline stage
 OUTCOMES = {
-    "connected":      {"stage": "contacted"},
+    "connected":      {"event": "connected", "stage": "contacted"},
     "no_answer":      {},
-    "visit_booked":   {"signals": {"visit_or_call_requested": True}, "stage": "site_visit"},
+    "visit_booked":   {"signals": {"visit_or_call_requested": True}, "event": "visit_booked", "stage": "site_visit"},
     "visit_done":     {"signals": {"already_visited": True}, "event": "site_visit_done", "stage": "site_visit"},
     "negotiating":    {"event": "negotiating", "stage": "negotiation"},
     "not_interested": {"not_interested": True, "stage": "lost"},
 }
+
+# A salesperson may move a lead on the board before logging the corresponding
+# call. Keep the live score in sync with that explicit progress as well.
+STAGE_EVENTS = {
+    "contacted": "connected",
+    "site_visit": "visit_booked",
+    "negotiation": "negotiating",
+}
+MANUAL_PRIORITY_SCORES = {"Hot": 85, "Warm": 55, "Cold": 20}
 
 
 class ValidationError(Exception):
@@ -230,7 +239,27 @@ def _activity(lead):
 
 
 def score_of(lead):
-    return rescore(lead["signals"], _activity(lead))
+    activity = _activity(lead)
+    scored = rescore(lead["signals"], activity)
+    override = lead.get("override") or {}
+    priority = override.get("to")
+    # An explicit salesperson correction can rehabilitate an out-of-service
+    # extraction error. Spam and an explicit "not interested" outcome remain
+    # hard disqualifications. Activity is then added to the manual baseline.
+    if (scored["tag"] == "Disqualified" and priority in MANUAL_PRIORITY_SCORES
+            and not lead["signals"].get("is_spam") and not activity.get("not_interested")):
+        adjustment = 0
+        for limit, points in SILENCE_PENALTY:
+            if activity.get("days_since_customer_reply", 0) >= limit:
+                adjustment = points
+                break
+        for event in activity.get("events") or []:
+            adjustment += EVENT_POINTS.get(event, 0)
+        baseline = MANUAL_PRIORITY_SCORES[priority]
+        return {"score": max(0, min(100, baseline + adjustment)), "tag": priority,
+                "breakdown": {"manual_priority": baseline, "activity": adjustment},
+                "reasons": [f"manual priority: {priority} ({baseline})"], "flags": []}
+    return scored
 
 
 def view(lead, summary=False):
@@ -276,6 +305,10 @@ def set_stage(store, lead, stage):
 
     def apply(l):
         l["stage"] = stage
+        event = STAGE_EVENTS.get(stage)
+        if event and is_ready(l):
+            activity = l.setdefault("activity", {})
+            activity["events"] = sorted(set(activity.get("events", []) + [event]))
         return {"history": [{"at": iso(), "why": f"Stage: {STAGE_LABEL[stage]}"}]}
     return view(_commit(store, lead["id"], apply, current=lead))
 

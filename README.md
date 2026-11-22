@@ -22,9 +22,9 @@ I thought about what happens before, during and after the screen.
 |---|---|
 | **Today's calls**<br>*before the call* | Orders Hot and Warm leads by score and by how long they've been waiting, and keeps any time the customer asked for ("call after 7 PM"). Leads nobody has replied to get a red timer. |
 | **Talking points, chat, WhatsApp**<br>*during the call* | Points to lead with, a chat that knows the lead, and a WhatsApp button that opens a chat with the reply already typed. |
-| **Log call**<br>*after the call* | Pick an outcome and type rough notes. The AI picks out anything new ("loan approved", "wife also decides"), the score updates (say 72 to 81), and you get a follow-up message and a new next action. |
+| **Log call**<br>*after the call* | Pick an outcome and type rough notes. The AI picks out anything new ("loan approved", "wife also decides"). Confirming contact, booking a visit, completing one, or starting negotiations updates the score immediately; you also get a follow-up message and a new next action. |
 | **Pipeline** | A board from New to Booked or Lost that you drag leads across. Logging a call moves the stage for you. |
-| **Change priority** | For when you disagree with the AI. It asks for a reason and keeps the AI's original tag visible. |
+| **Change priority** | For when you disagree with the AI. It asks for a reason and keeps the AI's original tag visible. Correcting an out-of-service classification starts from a representative manual score (Hot 85, Warm 55, Cold 20), and later call activity updates it. |
 
 ## Architecture
 
@@ -73,7 +73,7 @@ python tests/load/firestore_scale.py   # optional: the real database as leads pi
 
 - **The AI finds facts, code does the scoring.** A model asked for a 0-100 score gives different numbers each run and can't explain them. Rules give the same score every time, with a reason for every point.
 - **Not mentioned isn't "no", and objections don't hurt a lead.** No loan mentioned gets neutral points. A buyer who says "match the other builder's price and I'll book" is serious, so that goes in the analysis, not the score.
-- **The rules know what the AI doesn't:** realistic prices for the area, where we sell, and that big deals never go Cold.
+- **The rules know what the AI doesn't:** realistic prices for the area, where we sell, and that big deals never go Cold. A salesperson moving a lead through Contacted, Site visit or Negotiation, or logging the equivalent call outcome, adds a one-time activity signal to the live score. Spam and an explicit "not interested" outcome remain disqualified; a salesperson can correct an out-of-service extraction with a documented manual priority.
 - **Customer text is treated as data.** Facts are range-checked, stray links are removed from replies, and a message that tries to give the AI orders gets a warning on the lead.
 - **Save first, analyse second.** A failed analysis never loses the lead. It waits in "Needs analysis" with a Re-analyze button.
 - **Safe for several people at once.** Slow actions re-read the lead afterwards and write only what they changed, and the lead list is only re-read when something changed.
