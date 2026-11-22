@@ -1,0 +1,4 @@
+# One line-ending style in the repo, whatever the contributor's OS (stops the LF/CRLF warnings on Windows)
+* text=auto eol=lf
+
+*.png binary

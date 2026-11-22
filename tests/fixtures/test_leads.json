@@ -1,0 +1,316 @@
+{
+  "_about": "Synthetic test leads for a Bangalore real-estate lead-scoring tool. Names/phones are fictional. Message styles are modelled on public inquiry datasets (Manu-SMR/real-estate-agent) and typical portal/WhatsApp inquiries. Price ranges are approximate 2025-26 Bangalore market levels - verify on 99acres/MagicBricks before relying on them.",
+  "_assumed_company": "Developer/broker with projects ONLY in Bangalore (Whitefield, Sarjapur Road, Electronic City, Hebbal, Bannerghatta Road, Devanahalli).",
+  "_rough_price_reference_inr": {
+    "Whitefield 2BHK": "80L - 1.3Cr",
+    "Whitefield 3BHK": "1.3Cr - 2.2Cr",
+    "Sarjapur Road 2BHK": "75L - 1.2Cr",
+    "Sarjapur Road 3BHK": "1.2Cr - 2Cr",
+    "Electronic City 2BHK": "55L - 85L",
+    "Hebbal 3BHK": "1.6Cr - 3Cr",
+    "Bannerghatta Road 2BHK": "70L - 1.1Cr",
+    "Devanahalli plot 1200 sqft": "40L - 75L"
+  },
+  "_scoring_rubric": "Budget fit 0-25 | Timeline urgency 0-25 | Intent clarity 0-20 | Readiness (loan/visit/call) 0-20 | Engagement 0-10. 70+ Hot, 40-69 Warm, <40 Cold. Spam/out-of-area = Disqualified.",
+  "leads": [
+    {
+      "id": "L01",
+      "name": "Rohit Kulkarni",
+      "location": "Whitefield",
+      "property_requirement": "3BHK apartment, ready to move",
+      "budget": "1.6 Cr",
+      "timeline": "Within 1 month",
+      "message": "Hi, I'm relocating from Pune for my new job at ITPL, joining on 15th. Looking for a ready-to-move 3BHK near ITPL, budget around 1.6Cr. Home loan already sanctioned from HDFC for 1.2Cr. Can I visit this Saturday? Also please share the maintenance charges and whether OC is received.",
+      "expected": {
+        "tag": "Hot",
+        "score_range": [88, 98],
+        "key_signals": ["job relocation (hard deadline)", "loan sanctioned", "asked for site visit with a date", "budget fits Whitefield 3BHK", "asks OC/maintenance = serious buyer"],
+        "objections": ["needs OC-received property", "maintenance cost"],
+        "next_action": "Call within 15 minutes, confirm Saturday site visit, shortlist ready-to-move 3BHKs with OC."
+      }
+    },
+    {
+      "id": "L02",
+      "name": "Sneha Reddy",
+      "location": "Sarjapur Road",
+      "property_requirement": "2BHK",
+      "budget": "95 L",
+      "timeline": "2-3 months",
+      "message": "Our rental lease ends in March so we want to buy a 2BHK on Sarjapur Road, preferably near Wipro campus. Budget max 95L incl. registration. Is there any project with possession before April? We have 20L down payment ready.",
+      "expected": {
+        "tag": "Hot",
+        "score_range": [78, 90],
+        "key_signals": ["lease end = real deadline", "down payment ready", "specific location", "budget realistic"],
+        "objections": ["budget must include registration", "possession timing"],
+        "next_action": "Call today, share 2-3 ready/near-ready 2BHK options under 95L all-inclusive, propose site visit."
+      }
+    },
+    {
+      "id": "L03",
+      "name": "Arjun Mehta",
+      "location": "Electronic City",
+      "property_requirement": "2BHK",
+      "budget": "70 L",
+      "timeline": "3-6 months",
+      "message": "Interested in 2BHK in Electronic City Phase 1. Budget ~70L. Will need a home loan, haven't applied yet. Please share brochure and price list.",
+      "expected": {
+        "tag": "Warm",
+        "score_range": [55, 68],
+        "key_signals": ["clear requirement", "budget fits", "loan not yet applied", "only asked brochure (passive)"],
+        "objections": ["loan eligibility unknown"],
+        "next_action": "Send brochure + price list on WhatsApp, offer free loan-eligibility check, follow up in 2 days."
+      }
+    },
+    {
+      "id": "L04",
+      "name": "Priya Nair",
+      "location": "Hebbal",
+      "property_requirement": "3BHK",
+      "budget": "2.5 Cr",
+      "timeline": "6 months",
+      "message": "Looking at 3BHK options near Hebbal flyover for my parents. Will decide after discussing with my brother who is in the US, he will co-fund. Need good ventilation, lift with power backup, close to a hospital.",
+      "expected": {
+        "tag": "Warm",
+        "score_range": [50, 65],
+        "key_signals": ["strong budget", "clear needs (elderly-friendly)", "decision depends on another person (authority split)", "6 month timeline"],
+        "objections": ["co-decision maker abroad", "elderly accessibility"],
+        "next_action": "Offer a video walkthrough both siblings can join; highlight hospital proximity, lift backup."
+      }
+    },
+    {
+      "id": "L05",
+      "name": "Karthik S",
+      "location": "Bangalore",
+      "property_requirement": "Flat",
+      "budget": "",
+      "timeline": "Not decided",
+      "message": "price?",
+      "expected": {
+        "tag": "Cold",
+        "score_range": [5, 20],
+        "key_signals": ["one-word message", "no budget", "no timeline", "no location specificity"],
+        "objections": [],
+        "next_action": "Send automated price-range message with 2 qualifying questions (budget, BHK); no call yet."
+      }
+    },
+    {
+      "id": "L06",
+      "name": "Vikram Joshi",
+      "location": "Whitefield, Sarjapur, Hebbal, Yelahanka, JP Nagar",
+      "property_requirement": "Any 2 or 3 BHK",
+      "budget": "Depends",
+      "timeline": "Maybe next year",
+      "message": "Just exploring options in Bangalore. Not in a hurry. Send whatever you have.",
+      "expected": {
+        "tag": "Cold",
+        "score_range": [12, 28],
+        "key_signals": ["many unrelated locations", "no budget", "12+ months", "explicitly 'just exploring'"],
+        "objections": [],
+        "next_action": "Add to monthly newsletter/nurture list; re-check in 60 days."
+      }
+    },
+    {
+      "id": "L07",
+      "name": "Ananya Iyer",
+      "location": "Whitefield",
+      "property_requirement": "3BHK villa",
+      "budget": "60 L",
+      "timeline": "Immediately",
+      "message": "Need a 3BHK independent villa in Whitefield urgently, max 60 lakhs. Can pay full amount in cash, want to register this month.",
+      "expected": {
+        "tag": "Warm",
+        "score_range": [40, 55],
+        "key_signals": ["very urgent", "funds ready", "BUT budget far below market (villa in Whitefield is 2Cr+)"],
+        "objections": ["unrealistic budget"],
+        "next_action": "Call to reset expectations: suggest 2BHK apartment in Whitefield or villa plots in Devanahalli/Hoskote within budget.",
+        "why_tricky": "Urgency is high but budget-fit is near zero. Tool should NOT mark Hot just because of 'urgently'."
+      }
+    },
+    {
+      "id": "L08",
+      "name": "Rahul Verma",
+      "location": "Sarjapur Road",
+      "property_requirement": "Luxury 4BHK",
+      "budget": "4 Cr",
+      "timeline": "Not mentioned",
+      "message": "Send details",
+      "expected": {
+        "tag": "Warm",
+        "score_range": [35, 50],
+        "key_signals": ["high-value budget", "but vague message, no timeline"],
+        "objections": [],
+        "next_action": "Senior agent personal call - high ticket size justifies effort despite low intent signal.",
+        "why_tricky": "Big budget but low intent. Tests whether tool balances deal value vs. intent; should flag 'high value' even if score is mid."
+      }
+    },
+    {
+      "id": "L09",
+      "name": "Mohammed Faizal",
+      "location": "Bannerghatta Road",
+      "property_requirement": "2BHK",
+      "budget": "85L",
+      "timeline": "1-2 mahine",
+      "message": "Bhai mujhe Bannerghatta Road pe 2BHK chahiye, budget 85L tak. Bachho ka school wahi pe hai to next academic year se pehle shift hona hai. Loan ka process chalu hai SBI se. Weekend pe site dikha sakte ho?",
+      "expected": {
+        "tag": "Hot",
+        "score_range": [80, 92],
+        "key_signals": ["Hinglish message", "school admission deadline", "loan in process", "site visit request"],
+        "objections": ["loan not final yet"],
+        "next_action": "Reply in Hinglish, book weekend site visit, ask loan sanction amount.",
+        "why_tricky": "Tests Hinglish understanding; tool must extract same signals as an English message."
+      }
+    },
+    {
+      "id": "L10",
+      "name": "Deepa Krishnan",
+      "location": "Electronic City",
+      "property_requirement": "2BHK",
+      "budget": "65L",
+      "timeline": "3 months",
+      "message": "[10:02] Deepa: Hi saw your ad on FB for Green Meadows E-City\n[10:03] Agent: Hello ma'am, yes 2BHK starting 62L\n[10:05] Deepa: Is it RERA approved? Last builder I booked with delayed possession by 2 years, lost a lot\n[10:06] Agent: Yes RERA registered\n[10:08] Deepa: ok what is the possession date and can I see the RERA number. Also is there a 9:1 payment plan?\n[10:15] Deepa: ??",
+      "expected": {
+        "tag": "Warm",
+        "score_range": [60, 72],
+        "key_signals": ["chat transcript format", "specific project", "detailed questions", "follow-up '??' = engaged but waiting"],
+        "objections": ["trust issue - past builder delay", "wants RERA proof", "payment plan"],
+        "next_action": "Immediately share RERA number + possession date + payment plan; address delay fear with builder track record.",
+        "why_tricky": "Pasted chat transcript; strong objection that is actually a buying signal. Agent left her waiting - urgency to respond."
+      }
+    },
+    {
+      "id": "L11",
+      "name": "Sanjay Patil",
+      "location": "Andheri, Mumbai",
+      "property_requirement": "2BHK",
+      "budget": "1.5 Cr",
+      "timeline": "2 months",
+      "message": "Do you have any 2BHK projects in Andheri West? Need it in 2 months.",
+      "expected": {
+        "tag": "Disqualified",
+        "score_range": [0, 10],
+        "key_signals": ["location outside service area (Mumbai)"],
+        "objections": [],
+        "next_action": "Politely decline / refer to partner; do not spend call time.",
+        "why_tricky": "Good budget and timeline but wrong city. Tests business-rule awareness."
+      }
+    },
+    {
+      "id": "L12",
+      "name": "TechGrow Solutions",
+      "location": "",
+      "property_requirement": "",
+      "budget": "",
+      "timeline": "",
+      "message": "Hello sir, we provide digital marketing and lead generation services for real estate builders. Get 500 leads/month guaranteed. Call 98XXXXXX10.",
+      "expected": {
+        "tag": "Disqualified",
+        "score_range": [0, 0],
+        "key_signals": ["vendor pitch / spam"],
+        "objections": [],
+        "next_action": "Mark as spam."
+      }
+    },
+    {
+      "id": "L13",
+      "name": "Neha Gupta",
+      "location": "Sarjapur Road",
+      "property_requirement": "2BHK for investment / rental",
+      "budget": "90L",
+      "timeline": "Within 3 months",
+      "message": "I'm an NRI based in Dubai, looking to invest in a 2BHK near Sarjapur tech parks for rental income. What rental yield can I expect? Need someone to handle paperwork since I can't travel often. Can do video call.",
+      "expected": {
+        "tag": "Hot",
+        "score_range": [72, 85],
+        "key_signals": ["investor with clear goal", "budget fits", "3 month timeline", "open to video call"],
+        "objections": ["can't visit physically", "needs NRI paperwork help (POA, NRE account)", "rental yield expectations"],
+        "next_action": "Schedule video walkthrough, share rental yield data and NRI purchase process (POA).",
+        "why_tricky": "Can't do site visit - tool should not penalise lack of visit when video call is offered."
+      }
+    },
+    {
+      "id": "L14",
+      "name": "Amit Shah",
+      "location": "Whitefield",
+      "property_requirement": "3BHK",
+      "budget": "1.8Cr",
+      "timeline": "3 months",
+      "message": "Visited your Whitefield project last week with Ramesh. Liked the 3BHK east facing on 12th floor. But Prestige next door is offering 5% lower and free car parking. If you can match I'm ready to book.",
+      "expected": {
+        "tag": "Hot",
+        "score_range": [85, 95],
+        "key_signals": ["already did site visit", "specific unit chosen", "'ready to book' conditional on price", "competitor comparison"],
+        "objections": ["price vs competitor", "parking"],
+        "next_action": "Escalate to sales manager today for negotiation approval; risk of losing to competitor.",
+        "why_tricky": "Price objection + competitor mention looks negative, but this is the closest-to-booking lead in the set."
+      }
+    },
+    {
+      "id": "L15",
+      "name": "Lakshmi Rao",
+      "location": "Devanahalli",
+      "property_requirement": "Residential plot 1200 sqft",
+      "budget": "50L",
+      "timeline": "6-12 months",
+      "message": "Interested in BMRDA approved plots near Devanahalli airport. Want to build a house after retirement in 2 years. Is the layout A-Khata? Clear title?",
+      "expected": {
+        "tag": "Warm",
+        "score_range": [45, 60],
+        "key_signals": ["budget fits plots", "knowledgeable questions (A-Khata, title)", "long-ish timeline"],
+        "objections": ["legal / title clarity"],
+        "next_action": "Share approval docs + khata details, invite to weekend plot visit; nurture monthly.",
+        "why_tricky": "Long horizon but very informed buyer; tool should value document questions as intent."
+      }
+    },
+    {
+      "id": "L16",
+      "name": "Rakesh",
+      "location": "Hebbal",
+      "property_requirement": "3BHK",
+      "budget": "2Cr",
+      "timeline": "ASAP",
+      "message": "Whats the price for 3bhk",
+      "expected": {
+        "tag": "Warm",
+        "score_range": [40, 55],
+        "key_signals": ["form fields say ASAP and 2Cr (fits)", "but message is minimal"],
+        "objections": [],
+        "next_action": "Quick qualifying call to confirm urgency.",
+        "why_tricky": "Form fields and message disagree in strength - tool must weigh both, not just one."
+      }
+    },
+    {
+      "id": "L17",
+      "name": "Pooja & Nikhil Sharma",
+      "location": "Sarjapur Road",
+      "property_requirement": "3BHK, gated community, near good schools",
+      "budget": "1.4 - 1.6 Cr",
+      "timeline": "4 months",
+      "message": "We're a working couple with a 4-year-old. Want a gated society with a clubhouse and an international school within 3 km. We've shortlisted 2 other projects but yours looked good. Possession should be by June. Both of us have loan pre-approval. Can we get a callback after 7 PM on weekdays?",
+      "expected": {
+        "tag": "Hot",
+        "score_range": [78, 90],
+        "key_signals": ["pre-approved loan", "clear lifestyle needs", "comparing 3 projects (active stage)", "gave callback window"],
+        "objections": ["competing shortlist", "possession by June", "school proximity"],
+        "next_action": "Call after 7 PM today; lead with school distance + clubhouse; send comparison vs competitors.",
+        "why_tricky": "Gave a preferred call time - next action must respect it (good test for the 'next action' quality)."
+      }
+    },
+    {
+      "id": "L18",
+      "name": "Suresh Babu",
+      "location": "Electronic City",
+      "property_requirement": "1BHK",
+      "budget": "35L",
+      "timeline": "1 month",
+      "message": "Anything 1BHK under 35L in E City? Ready to move only. Bank approved for 30L.",
+      "expected": {
+        "tag": "Warm",
+        "score_range": [50, 65],
+        "key_signals": ["urgent", "loan approved", "budget slightly tight but possible for resale 1BHK"],
+        "objections": ["tight budget", "ready-to-move only"],
+        "next_action": "Check resale/1BHK inventory; if none, say so honestly and suggest nearby Chandapura.",
+        "why_tricky": "Strong readiness, borderline budget fit - should land upper Warm, not Hot or Cold."
+      }
+    }
+  ]
+}

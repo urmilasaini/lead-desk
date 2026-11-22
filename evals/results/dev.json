@@ -1,0 +1,10 @@
+{
+ "model": "gemini-3.5-flash-lite",
+ "split": "dev",
+ "leads": 75,
+ "at": "2026-11-22T07:48:49.749802+00:00",
+ "extract": {
+  "stopped": "daily quota reached"
+ },
+ "seconds": 104
+}

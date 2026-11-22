@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lead Desk</title>
+<meta name="description" content="AI lead prioritization for real-estate salespeople">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23111'/%3E%3Crect x='8' y='8' width='16' height='16' rx='4' fill='%2314B8A6'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+<div class="app">
+  <aside class="side" id="side">
+    <div class="brand"><div class="mark"><span></span></div>Lead Desk</div>
+    <button class="btn primary add" data-action="add"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Add lead</button>
+    <nav class="nav" id="nav">
+      <button data-view="overview"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Overview</button>
+      <button data-view="leads"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Leads</button>
+      <button data-view="pipeline"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="5" height="16" rx="1"/><rect x="10" y="4" width="5" height="11" rx="1"/><rect x="17" y="4" width="4" height="7" rx="1"/></svg>Pipeline</button>
+      <button data-view="calls"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Today's calls<span class="badge hidden" id="callBadge"></span></button>
+      <button data-view="how"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 .9-1 1.7M12 17h.01"/></svg>How it works</button>
+    </nav>
+    <div class="legend">
+      <b>How leads are ranked</b>
+      <div><span class="dot d-Hot"></span>Hot · 70+ · call today</div>
+      <div><span class="dot d-Warm"></span>Warm · 40–69 · follow up</div>
+      <div><span class="dot d-Cold"></span>Cold · under 40 · nurture</div>
+      <div><span class="dot d-Disqualified"></span>Disqualified · spam / wrong area</div>
+    </div>
+    <div class="user"><div class="avatar">US</div><div><b>Urmila Saini</b><span>Sales executive</span></div></div>
+  </aside>
+
+  <div class="content">
+    <header class="top">
+      <button class="icon-btn menu-btn" id="menu" aria-label="Menu"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+      <h1 id="title">Overview</h1>
+      <button class="icon-btn" id="theme" title="Dark mode" aria-label="Toggle dark mode"><svg viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>
+      <div class="avatar">US</div>
+    </header>
+
+    <main class="page">
+      <div id="banners"></div>
+
+      <!-- OVERVIEW -->
+      <section id="v-overview">
+        <div class="hello"><h2 id="greet">Hello</h2><p id="date"></p><p class="summary" id="summary"></p></div>
+        <div id="emptyNote"></div>
+        <div class="tiles" id="tiles"></div>
+
+        <div class="ov-top">
+          <div class="card" id="hero"></div>
+          <div class="card">
+            <div class="card-h"><div><h3>Lead mix</h3><p>by AI priority</p></div></div>
+            <div class="card-b" id="mix"></div>
+          </div>
+        </div>
+
+        <div class="ov-grid">
+          <div class="card">
+            <div class="card-h"><div><h3>Up next</h3><p>after the lead above, in call-plan order</p></div><button class="btn sm" data-view="calls">Call plan</button></div>
+            <div id="upnext"></div>
+          </div>
+          <div class="card">
+            <div class="card-h"><div><h3>Needs attention</h3><p>things worth a quick look</p></div></div>
+            <div id="attention"></div>
+          </div>
+        </div>
+
+        <div class="card ov-pipe">
+          <div class="card-h"><div><h3>Pipeline</h3><p>where your deals are right now</p></div><button class="btn sm" data-view="pipeline">Open board</button></div>
+          <div class="card-b"><div class="stage-strip" id="funnel"></div></div>
+        </div>
+
+        <div class="card hint-card">
+          <div class="card-b"><b>New here?</b> <span class="muted">Add a lead (or import a CSV) and the AI will score it and tell you what to do next.</span>
+            <button class="btn sm" data-view="how" style="margin-left:10px">See how it works</button></div>
+        </div>
+      </section>
+
+      <!-- LEADS -->
+      <section id="v-leads" class="hidden">
+        <div class="bar">
+          <div class="seg" id="seg"><button class="on" data-mode="board">Board</button><button data-mode="list">List</button></div>
+          <input class="search" id="q" placeholder="Search by name, area or need">
+          <span class="spacer"></span>
+          <button class="btn" data-action="import"><svg viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>Import CSV</button>
+          <button class="btn primary" data-action="add"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Add lead</button>
+        </div>
+        <div id="leadsNote"></div>
+        <div class="board" id="board"></div>
+        <div class="card hidden" id="table"></div>
+      </section>
+
+      <!-- PIPELINE -->
+      <section id="v-pipeline" class="hidden">
+        <div class="bar">
+          <span class="muted" style="font-size:13px">Drag a lead to the next stage as the deal moves forward. The dot shows the AI priority.</span>
+          <span class="spacer"></span>
+          <button class="btn primary" data-action="add"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Add lead</button>
+        </div>
+        <div id="pipeNote"></div>
+        <div class="kanban" id="kanban"></div>
+      </section>
+
+      <!-- LEAD -->
+      <section id="v-lead" class="hidden">
+        <button class="back" id="back"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>Back to leads</button>
+        <div class="lead-page" id="detail"></div>
+      </section>
+
+      <!-- CALLS -->
+      <section id="v-calls" class="hidden">
+        <div class="card">
+          <div class="card-h"><div><h3>Today's call plan</h3><p>Built from score + how long each lead has waited. Times the customer asked for are kept. Log each call to update the score.</p></div><span class="pill" id="planCount"></span></div>
+          <div id="plan"></div>
+        </div>
+      </section>
+
+      <!-- HOW IT WORKS -->
+      <section id="v-how" class="hidden">
+        <div class="how">
+          <div class="hello"><h2>How Lead Desk works</h2><p>From a raw inquiry to "call this person now", in a few seconds.</p></div>
+
+          <div class="card"><div class="card-h"><div><h3>The flow</h3><p>Three steps for every lead</p></div></div>
+            <div class="card-b"><div class="steps">
+              <div class="step"><b><i>1</i>Add</b><p>Add a lead with the form, or import many at once from a CSV file. Paste the customer's message in English, Hinglish or as a WhatsApp chat.</p></div>
+              <div class="step"><b><i>2</i>Analyze</b><p>The AI reads the message and pulls out the facts. A fixed scoring rubric turns them into a 0–100 score, then the AI writes your next step and a reply.</p></div>
+              <div class="step"><b><i>3</i>Act</b><p>Call the hottest leads first, send the reply on WhatsApp, ask the AI questions about the lead, and log each call so the score stays current.</p></div>
+            </div></div></div>
+
+          <div class="card"><div class="card-h"><div><h3>What you get for every lead</h3></div></div>
+            <div class="card-b"><div class="grid3">
+              <div><b>Recommended next action</b><p class="muted">One clear step, with when and why.</p></div>
+              <div><b>Lead summary</b><p class="muted">Who they are and how urgent it is.</p></div>
+              <div><b>Customer intent</b><p class="muted">What they really want.</p></div>
+              <div><b>Key requirements</b><p class="muted">Area, size, must-haves, and what's still unknown.</p></div>
+              <div><b>Objections / concerns</b><p class="muted">Each with a way to handle it.</p></div>
+              <div><b>Suggested response</b><p class="muted">A ready reply you can copy or send on WhatsApp.</p></div>
+            </div></div></div>
+
+          <div class="card"><div class="card-h"><div><h3>How the score works</h3><p>The AI finds the facts. The score itself comes from fixed rules, so the same lead always gets the same score and every point has a reason.</p></div></div>
+            <div class="card-b">
+              <table class="lt how-table"><thead><tr><th>Factor</th><th>Points</th><th>What it looks at</th></tr></thead><tbody>
+                <tr><td><b>Budget fit</b></td><td>20</td><td>Is the budget realistic for that area and property type?</td></tr>
+                <tr><td><b>Funds ready</b></td><td>15</td><td>Loan sanctioned, pre-approved or paying from own funds</td></tr>
+                <tr><td><b>Timeline</b></td><td>20</td><td>How soon they want to buy</td></tr>
+                <tr><td><b>Clear need</b></td><td>15</td><td>Property type, area and a real reason, like a job move, lease ending or school admission</td></tr>
+                <tr><td><b>Buying intent</b></td><td>15</td><td>Asked for a visit or call, already visited, ready to book, asked specific questions</td></tr>
+                <tr><td><b>Decision maker</b></td><td>10</td><td>Decides alone, or needs someone else's approval</td></tr>
+                <tr><td><b>Detail given</b></td><td>5</td><td>How many concrete details the message contains</td></tr>
+              </tbody></table>
+              <div class="grid3" style="margin-top:16px">
+                <div><span class="pill"><span class="dot d-Hot"></span>Hot · 70+</span><p class="muted">Call today. Strong fit and real urgency.</p></div>
+                <div><span class="pill"><span class="dot d-Warm"></span>Warm · 40–69</span><p class="muted">Interested, but something is missing. Follow up within days.</p></div>
+                <div><span class="pill"><span class="dot d-Cold"></span>Cold · under 40</span><p class="muted">Just browsing. Send a light follow-up.</p></div>
+              </div>
+              <ul class="rules">
+                <li><b>Not mentioned doesn't mean no.</b> If a customer doesn't mention a loan, that factor gets a neutral score, not zero.</li>
+                <li><b>Objections don't lower the score.</b> A customer who says "match the other builder's price and I'll book" is serious. Objections appear with ways to handle them.</li>
+                <li><b>Big deals get a call.</b> Leads of ₹3 Cr or more never drop to Cold.</li>
+                <li><b>Spam and wrong cities are Disqualified.</b> They don't take up your time.</li>
+                <li><b>Scores change over time.</b> If the customer goes quiet for 3, 7 or 14 days the score drops. A site visit or negotiation raises it.</li>
+                <li><b>You have the final say.</b> Use “Change priority” on a lead and give a reason. It's marked as changed, and the original AI priority stays visible.</li>
+              </ul>
+            </div></div>
+
+          <div class="card"><div class="card-h"><div><h3>Your day with Lead Desk</h3></div></div>
+            <div class="card-b"><div class="grid3">
+              <div><b>Before the call</b><p class="muted">Open <b>Today's calls</b> for the best order to call. A red ⏱ means a lead has been waiting too long.</p></div>
+              <div><b>During the call</b><p class="muted">Use the talking points on the lead page, or ask the AI chat: “What should I emphasize?”</p></div>
+              <div><b>After the call</b><p class="muted">Tap <b>Log call</b>, add rough notes, and the score updates. You also get a follow-up message to send.</p></div>
+            </div></div></div>
+
+          <div class="card"><div class="card-h"><div><h3>Priority vs. pipeline stage</h3></div></div>
+            <div class="card-b">
+              <p style="margin-top:0"><b>Priority</b> (Hot / Warm / Cold) says <i>how likely and how urgent</i> a lead is. The AI sets it, and it can change as new information arrives.</p>
+              <p><b>Stage</b> says <i>where the deal is</i>: New → Contacted → Site visit → Negotiation → Booked (or Lost). You move it, either by dragging cards on the <b>Pipeline</b> page or from the lead page. Logging a call moves the stage forward for you.</p>
+            </div></div>
+
+          <div class="card"><div class="card-h"><div><h3>Importing many leads</h3></div></div>
+            <div class="card-b">
+              <ol class="rules" style="padding-left:18px">
+                <li>Go to <b>Leads → Import CSV</b>.</li>
+                <li>Use a file with the columns <code>name, phone, location, requirement, budget, timeline, message</code>. Only <code>name</code> and <code>message</code> are required, and up to 50 leads per file.</li>
+                <li>Each lead is analysed one by one. If one doesn't finish, it is still saved. Use <b>Re-analyze</b> on it, or <b>Open</b> it.</li>
+              </ol>
+              <a class="btn sm" href="/static/sample_leads.csv" download>Download sample CSV</a>
+            </div></div>
+
+          <div class="card"><div class="card-h"><div><h3>Everything is real</h3><p>Nothing is pre-filled. Every summary, score and reply you see was produced for a lead you added.</p></div></div></div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<!-- Chat widget (only on a lead page) -->
+<button class="cw-fab hidden" id="chatFab" aria-label="Ask the AI about this lead"><svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.4A8 8 0 1 1 21 12z"/></svg><span>Ask AI</span></button>
+<div class="cw hidden" id="chatPanel" role="dialog" aria-label="Chat about this lead"></div>
+
+<!-- Add lead -->
+<div class="modal" id="addModal">
+  <div class="card sheet">
+    <div class="card-h"><div><h3 id="mTitle">Add a lead</h3><p id="mSub">Fill in what you know. The message matters most.</p></div>
+      <button class="btn sm" id="sample" type="button">Load sample lead</button></div>
+    <form class="card-b" id="addForm">
+      <div class="fgrid">
+        <label class="field">Name<input name="name" required maxlength="120" placeholder="e.g. Rohit Kulkarni"></label>
+        <label class="field">Phone <small>Optional, for WhatsApp</small><input name="phone" maxlength="20" inputmode="tel" placeholder="e.g. 98765 43210"></label>
+        <label class="field">Location<input name="location" maxlength="120" placeholder="e.g. Whitefield"></label>
+        <label class="field">Property requirement<input name="requirement" maxlength="200" placeholder="e.g. 3BHK, ready to move"></label>
+        <label class="field">Budget<input name="budget" maxlength="60" placeholder="e.g. 1.6 Cr or 85 L"></label>
+        <label class="field">Buying timeline<select name="timeline"><option>Within 1 month</option><option>2-3 months</option><option>3-6 months</option><option>6-12 months</option><option>Not decided</option></select></label>
+      </div>
+      <label class="field">Customer message <small>Paste the inquiry or the whole WhatsApp chat</small><textarea name="message" required rows="5" maxlength="6000" placeholder="e.g. Hi, I'm relocating for a new job and need a 3BHK near ITPL..."></textarea></label>
+      <div class="form-err hidden" id="addErr"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:18px">
+        <button type="button" class="linkbtn" data-action="import">Import many from CSV instead</button>
+        <span style="display:flex;gap:8px"><button type="button" class="btn" data-close>Cancel</button>
+        <button class="btn primary"><svg viewBox="0 0 24 24"><path d="M12 3l1.9 5.8L20 10l-6.1 1.2L12 17l-1.9-5.8L4 10l6.1-1.2z"/></svg>Analyze with AI</button></span>
+      </div>
+    </form>
+    <div class="card-b hidden" id="progressBody">
+      <ul class="progress" id="progress">
+        <li><i></i>Reading the customer message</li>
+        <li><i></i>Scoring with the rubric</li>
+        <li><i></i>Writing summary, next step and reply</li>
+      </ul>
+    </div>
+    <div class="card-b hidden" id="addResult"></div>
+  </div>
+</div>
+
+<!-- Import CSV -->
+<div class="modal" id="importModal">
+  <div class="card sheet" style="max-width:720px">
+    <div class="card-h"><div><h3>Import leads from CSV</h3><p id="impSub">Add many leads at once. Each one is analysed by the AI.</p></div>
+      <a class="btn sm" href="/static/sample_leads.csv" download>Download sample CSV</a></div>
+    <div class="card-b" id="impStart">
+      <label class="drop" id="drop">
+        <svg viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5M5 20h14"/></svg>
+        <b>Choose a CSV file</b><span class="muted">or drop it here</span>
+        <input type="file" id="csvFile" accept=".csv,text/csv" hidden>
+      </label>
+      <p class="muted" style="font-size:13px;margin:12px 0 0">Columns: <code>name, phone, location, requirement, budget, timeline, message</code>. Only <code>name</code> and <code>message</code> are required. Up to 50 leads per file.</p>
+      <div class="form-err hidden" id="impErr"></div>
+    </div>
+    <div class="card-b hidden" id="impPreview"></div>
+    <div class="card-b hidden" id="impRun"></div>
+  </div>
+</div>
+
+<!-- Log call -->
+<div class="modal" id="callModal">
+  <div class="card sheet" style="max-width:500px">
+    <div class="card-h"><div><h3>Log call</h3><p id="callSub"></p></div></div>
+    <form class="card-b" id="callForm">
+      <label class="field">What happened?
+        <select name="outcome">
+          <option value="connected">Talked to the customer</option>
+          <option value="no_answer">No answer</option>
+          <option value="visit_booked">Site visit booked</option>
+          <option value="visit_done">Site visit done</option>
+          <option value="negotiating">Negotiating price / terms</option>
+          <option value="not_interested">Not interested</option>
+        </select></label>
+      <label class="field">Notes <small>Anything new: loan status, budget, who decides, concerns. Hinglish is fine.</small>
+        <textarea name="notes" rows="4" maxlength="3000" placeholder="e.g. Loan approved for 1.4 Cr, wife also wants to see it, worried about possession date"></textarea></label>
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:18px">
+        <button type="button" class="btn" data-close>Cancel</button><button class="btn primary" id="callSave">Save and update score</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Change priority -->
+<div class="modal" id="ovModal">
+  <div class="card sheet" style="max-width:440px">
+    <div class="card-h"><div><h3>Change priority</h3><p id="ovSub"></p></div></div>
+    <div class="card-b">
+      <label class="field">Move to<select id="ovTo"><option>Hot</option><option>Warm</option><option>Cold</option><option>Disqualified</option></select></label>
+      <label class="field">Why? <small>Saved as feedback to improve the scoring</small><input id="ovReason" maxlength="300" placeholder="e.g. Called him, he's ready to book this week"></label>
+      <div style="display:flex;justify-content:space-between;gap:8px;margin-top:18px">
+        <button class="btn" id="ovReset">Use AI priority</button>
+        <span><button class="btn" data-close>Cancel</button> <button class="btn primary" id="ovSave">Save</button></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Phone -->
+<div class="modal" id="phoneModal">
+  <div class="card sheet" style="max-width:400px">
+    <div class="card-h"><div><h3>WhatsApp number</h3><p id="phoneSub"></p></div></div>
+    <form class="card-b" id="phoneForm">
+      <label class="field">Phone number <small>10-digit Indian number, or with country code like +971…</small><input name="phone" maxlength="20" inputmode="tel" placeholder="e.g. 98765 43210"></label>
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:18px"><button type="button" class="btn" data-close>Cancel</button><button class="btn primary">Save</button></div>
+    </form>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status"></div>
+<script src="/static/lib.js"></script>
+<script src="/static/app.js"></script>
+</body>
+</html>

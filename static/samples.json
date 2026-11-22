@@ -1,0 +1,50 @@
+[
+ {
+  "name": "Arjun Mehta",
+  "location": "Electronic City",
+  "requirement": "2BHK",
+  "budget": "70 L",
+  "timeline": "3-6 months",
+  "message": "Interested in 2BHK in Electronic City Phase 1. Budget ~70L. Will need a home loan, haven't applied yet. Please share brochure and price list."
+ },
+ {
+  "name": "Priya Nair",
+  "location": "Hebbal",
+  "requirement": "3BHK",
+  "budget": "2.5 Cr",
+  "timeline": "6 months",
+  "message": "Looking at 3BHK options near Hebbal flyover for my parents. Will decide after discussing with my brother who is in the US, he will co-fund. Need good ventilation, lift with power backup, close to a hospital."
+ },
+ {
+  "name": "Lakshmi Rao",
+  "location": "Devanahalli",
+  "requirement": "Residential plot 1200 sqft",
+  "budget": "50L",
+  "timeline": "6-12 months",
+  "message": "Interested in BMRDA approved plots near Devanahalli airport. Want to build a house after retirement in 2 years. Is the layout A-Khata? Clear title?"
+ },
+ {
+  "name": "Suresh Babu",
+  "location": "Electronic City",
+  "requirement": "1BHK",
+  "budget": "35L",
+  "timeline": "1 month",
+  "message": "Anything 1BHK under 35L in E City? Ready to move only. Bank approved for 30L."
+ },
+ {
+  "name": "Vikram Joshi",
+  "location": "Whitefield, Sarjapur, Hebbal, Yelahanka, JP Nagar",
+  "requirement": "Any 2 or 3 BHK",
+  "budget": "Depends",
+  "timeline": "Maybe next year",
+  "message": "Just exploring options in Bangalore. Not in a hurry. Send whatever you have."
+ },
+ {
+  "name": "TechGrow Solutions",
+  "location": "",
+  "requirement": "",
+  "budget": "",
+  "timeline": "",
+  "message": "Hello sir, we provide digital marketing and lead generation services for real estate builders. Get 500 leads/month guaranteed. Call 98XXXXXX10."
+ }
+]

@@ -1,0 +1,12 @@
+{
+  "_about": "Approx. Bangalore 2025-26 price ranges in lakhs [min, max]. Estimates; verify on 99acres/MagicBricks and update here, no code change needed.",
+  "service_areas": {
+    "Whitefield":        {"1BHK": [45, 70],  "2BHK": [80, 130],  "3BHK": [130, 220], "4BHK": [220, 400], "villa": [200, 500], "plot": [80, 200]},
+    "Sarjapur Road":     {"1BHK": [40, 65],  "2BHK": [75, 120],  "3BHK": [120, 200], "4BHK": [250, 450], "villa": [180, 450], "plot": [60, 150]},
+    "Electronic City":   {"1BHK": [30, 45],  "2BHK": [55, 85],   "3BHK": [85, 140],  "4BHK": [150, 250], "villa": [120, 250], "plot": [40, 90]},
+    "Hebbal":            {"1BHK": [55, 85],  "2BHK": [100, 160], "3BHK": [160, 300], "4BHK": [300, 600], "villa": [300, 800], "plot": [120, 300]},
+    "Bannerghatta Road": {"1BHK": [40, 60],  "2BHK": [70, 110],  "3BHK": [110, 180], "4BHK": [180, 350], "villa": [180, 400], "plot": [70, 160]},
+    "Devanahalli":       {"1BHK": [30, 45],  "2BHK": [50, 80],   "3BHK": [75, 130],  "4BHK": [130, 220], "villa": [100, 250], "plot": [40, 75]}
+  },
+  "type_fallback": {"1BHK": [30, 60], "2BHK": [60, 120], "3BHK": [120, 220], "4BHK": [220, 450], "villa": [200, 500], "plot": [40, 100]}
+}

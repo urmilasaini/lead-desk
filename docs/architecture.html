@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lead Desk: system architecture</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  /* the app's own palette: zinc neutrals, black primary, and accents that mean something */
+  :root{--ink:#09090B;--muted:#71717A;--line:#D4D4D8;--soft:#F4F4F5;--bg:#FAFAFA;
+        --ai:#2563EB;--ai-t:#EAF1FE;--code:#16A34A;--code-t:#E7F6EC;--store:#D97706;--store-t:#FEF3E2;--hot:#DC2626}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);width:1600px;height:1010px;position:relative;font-family:Inter,"Segoe UI",system-ui,sans-serif;color:var(--ink);overflow:hidden}
+  .abs{position:absolute}
+  .title{font-weight:800;font-size:26px;line-height:1;color:var(--ink);letter-spacing:-.01em}
+  .dash{border:2px dashed var(--line);border-radius:26px;background:#fff}
+  .dash.soft{background:var(--soft)}
+  .dash.code{border-color:#8fd4a6}
+  .dash.store{border-color:#f0c27a}
+  .ic{width:28px;height:28px;stroke:#27272A;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+  .ic.lg{width:34px;height:34px}
+  .lbl .node{position:relative}   /* only the lane nodes carry a step number; the rest are absolutely placed */
+  .node{width:68px;height:68px;border-radius:50%;border:2px dashed var(--line);background:#fff;display:grid;place-items:center}
+  .node.lg{width:100px;height:100px}
+  .node.ai{border:2px solid var(--ai);background:var(--ai-t)}
+  .node.ai .ic{stroke:var(--ai)}
+  .node.code{border:2px solid var(--code);background:var(--code-t)}
+  .node.code .ic{stroke:var(--code)}
+  .num{position:absolute;top:-5px;left:-5px;width:24px;height:24px;border-radius:50%;background:var(--ink);color:#fff;font:700 12px/24px Inter,sans-serif;text-align:center}
+  .lbl{text-align:center;font-size:12px;color:var(--muted);line-height:1.35}
+  .lbl b{display:block;font-size:14px;color:var(--ink);font-weight:700;margin-bottom:1px}
+  .badge{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.04em;padding:1px 7px;border-radius:99px;margin-left:5px;vertical-align:1px}
+  .b-ai{background:var(--ai-t);color:var(--ai)}
+  .b-code{background:var(--code-t);color:var(--code)}
+  .item{text-align:center;font-size:12px;line-height:1.25;font-weight:600;color:var(--ink);width:104px}
+  .item .ic{display:block;margin:0 auto 6px}
+  .box-h{font-weight:800;font-size:20px;color:var(--ink);display:flex;align-items:center;gap:9px}
+  .box-h small{font-weight:500;font-size:13px;color:var(--muted)}
+  .dot{display:inline-block;width:10px;height:10px;border-radius:50%}
+  .foot-line{font-size:12.5px;color:var(--muted);text-align:center}
+  .card{display:flex;align-items:center;gap:14px;padding:0 18px;border-radius:20px}
+  .card b{display:block;font-size:15px;font-weight:700}
+  .card span{font-size:12.5px;color:var(--muted);line-height:1.4}
+  .card i{display:inline-block;width:8px;height:8px;border-radius:50%;margin:0 3px 0 1px;vertical-align:0}
+  .legend{display:flex;gap:22px;font-size:13px;color:var(--muted);font-weight:500;align-items:center}
+  .legend span{display:flex;align-items:center;gap:7px}
+</style>
+</head>
+<body>
+
+<!-- icon sprite -->
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <symbol id="user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></symbol>
+    <symbol id="form" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></symbol>
+    <symbol id="upload" viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5M5 20h14"/></symbol>
+    <symbol id="chat" viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.4A8 8 0 1 1 21 12z"/></symbol>
+    <symbol id="bars" viewBox="0 0 24 24"><path d="M5 20V10M12 20V4M19 20v-7"/></symbol>
+    <symbol id="spark" viewBox="0 0 24 24"><path d="M12 3l1.9 5.8L20 10l-6.1 1.2L12 17l-1.9-5.8L4 10l6.1-1.2z"/></symbol>
+    <symbol id="gauge" viewBox="0 0 24 24"><path d="M4 17a8 8 0 1 1 16 0"/><path d="M12 17l4-5"/><circle cx="12" cy="17" r="1"/></symbol>
+    <symbol id="doccheck" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/></symbol>
+    <symbol id="phone" viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></symbol>
+    <symbol id="shield" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/></symbol>
+    <symbol id="db" viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v6c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6"/></symbol>
+    <symbol id="clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="kanban" viewBox="0 0 24 24"><rect x="3" y="4" width="5" height="16" rx="1"/><rect x="10" y="4" width="5" height="11" rx="1"/><rect x="17" y="4" width="4" height="7" rx="1"/></symbol>
+    <symbol id="refresh" viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/></symbol>
+    <symbol id="zap" viewBox="0 0 24 24"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></symbol>
+    <symbol id="wallet" viewBox="0 0 24 24"><path d="M3 7h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M3 7l2-3h12M16 14h2"/></symbol>
+    <symbol id="target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></symbol>
+    <symbol id="home" viewBox="0 0 24 24"><path d="M3 11l9-8 9 8M5 10v10h14V10"/></symbol>
+    <symbol id="people" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5M15 20c0-2 1.5-3.5 4-4"/></symbol>
+    <symbol id="eye" viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+    <symbol id="alert" viewBox="0 0 24 24"><path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18h.01"/></symbol>
+    <symbol id="flag" viewBox="0 0 24 24"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></symbol>
+    <symbol id="send" viewBox="0 0 24 24"><path d="M21 3L3 11l7 2 2 7z"/><path d="M10 13l11-10"/></symbol>
+    <symbol id="list" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></symbol>
+  </defs>
+</svg>
+
+<!-- connectors (drawn first, so the nodes sit on top) -->
+<svg class="abs" style="left:0;top:0" width="1600" height="900" fill="none">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M1 1l8 4-8 4z" fill="#09090B"/></marker>
+  </defs>
+  <g stroke="#A1A1AA" stroke-width="1.6">
+    <!-- lane arrows -->
+    <g stroke="#09090B"><path d="M186 96H327" marker-end="url(#arr)"/><path d="M403 96H545" marker-end="url(#arr)"/><path d="M621 96H762" marker-end="url(#arr)"/>
+      <path d="M838 96H979" marker-end="url(#arr)"/><path d="M1055 96H1197" marker-end="url(#arr)"/><path d="M1273 96H1414" marker-end="url(#arr)"/></g>
+    <!-- inputs -> intake -->
+    <path d="M144 300C230 300 215 470 280 478"/>
+    <path d="M144 415C230 415 225 475 280 480"/>
+    <path d="M144 530C230 530 225 485 280 482"/>
+    <path d="M144 645C230 645 215 490 280 484"/>
+    <!-- intake -> engine / safety -->
+    <path d="M382 480C425 480 425 360 470 360"/>
+    <path d="M382 480C425 480 425 595 470 595"/>
+    <!-- engine -> advice cards, safety -> chat card -->
+    <path d="M940 360C990 360 990 291 1040 291"/>
+    <path d="M940 360C990 360 990 401 1040 401"/>
+    <path d="M940 360C990 360 990 511 1040 511"/>
+    <path d="M940 602C990 602 990 621 1040 621"/>
+    <!-- lane -> engine, engine -> safety, safety -> storage, lane -> also-in-app -->
+    <g stroke-dasharray="2 6" stroke="#71717A" stroke-width="2.4" stroke-linecap="round">
+      <path d="M800 192V230"/><path d="M705 490V520"/><path d="M705 684V708"/><path d="M1540 192V245"/>
+    </g>
+  </g>
+  <g fill="#09090B">
+    <circle cx="144" cy="300" r="3.2"/><circle cx="144" cy="415" r="3.2"/><circle cx="144" cy="530" r="3.2"/><circle cx="144" cy="645" r="3.2"/>
+    <circle cx="470" cy="360" r="3.2"/><circle cx="470" cy="595" r="3.2"/>
+    <circle cx="940" cy="360" r="3.8"/><circle cx="940" cy="602" r="3.2"/>
+    <circle cx="1040" cy="291" r="3.2"/><circle cx="1040" cy="401" r="3.2"/><circle cx="1040" cy="511" r="3.2"/><circle cx="1040" cy="621" r="3.2"/>
+    <circle cx="800" cy="211" r="3.8"/><circle cx="705" cy="505" r="3.8"/><circle cx="705" cy="696" r="3.8"/><circle cx="1540" cy="218" r="3.8"/>
+  </g>
+</svg>
+
+<!-- ===== Salesperson lane ===== -->
+<div class="abs title" style="left:46px;top:20px">Salesperson lane</div>
+<div class="abs dash soft" style="left:40px;top:50px;width:1520px;height:142px"></div>
+
+<div class="abs lbl" style="left:48px;top:62px;width:200px"><div class="node" style="margin:0 auto 6px"><svg class="ic lg"><use href="#user"/></svg></div><b>Salesperson</b>adds or imports a lead</div>
+<div class="abs lbl" style="left:265px;top:62px;width:200px"><div class="node" style="margin:0 auto 6px"><svg class="ic lg"><use href="#form"/></svg></div><b>Lead form or CSV</b>6 fields, up to 50 per file</div>
+<div class="abs lbl" style="left:483px;top:62px;width:200px"><div class="node ai" style="margin:0 auto 6px"><span class="num">1</span><svg class="ic lg"><use href="#spark"/></svg></div><b>Extract facts<span class="badge b-ai">AI</span></b>Gemini, JSON only</div>
+<div class="abs lbl" style="left:700px;top:62px;width:200px"><div class="node code" style="margin:0 auto 6px"><span class="num">2</span><svg class="ic lg"><use href="#gauge"/></svg></div><b>Score 0-100<span class="badge b-code">CODE</span></b>rules.py, no AI</div>
+<div class="abs lbl" style="left:917px;top:62px;width:200px"><div class="node ai" style="margin:0 auto 6px"><span class="num">3</span><svg class="ic lg"><use href="#spark"/></svg></div><b>Write analysis<span class="badge b-ai">AI</span></b>Gemini, knows the score</div>
+<div class="abs lbl" style="left:1135px;top:62px;width:200px"><div class="node" style="margin:0 auto 6px"><svg class="ic lg"><use href="#doccheck"/></svg></div><b>Lead page</b>next action and reply</div>
+<div class="abs lbl" style="left:1352px;top:62px;width:200px"><div class="node" style="margin:0 auto 6px"><svg class="ic lg"><use href="#send"/></svg></div><b>Salesperson acts</b>WhatsApp, log call</div>
+
+<!-- ===== Inputs ===== -->
+<div class="abs title" style="left:40px;top:205px">Inputs</div>
+<div class="abs node" style="left:76px;top:266px"><svg class="ic"><use href="#form"/></svg></div>
+<div class="abs lbl" style="left:20px;top:340px;width:180px"><b>Lead form</b>six fields + phone</div>
+<div class="abs node" style="left:76px;top:381px"><svg class="ic"><use href="#upload"/></svg></div>
+<div class="abs lbl" style="left:20px;top:455px;width:180px"><b>CSV import</b>up to 50 leads</div>
+<div class="abs node" style="left:76px;top:496px"><svg class="ic"><use href="#chat"/></svg></div>
+<div class="abs lbl" style="left:20px;top:570px;width:180px"><b>Customer message</b>English, Hinglish, chat</div>
+<div class="abs node" style="left:76px;top:611px"><svg class="ic"><use href="#bars"/></svg></div>
+<div class="abs lbl" style="left:20px;top:685px;width:180px"><b>Market prices</b>per area and property type</div>
+
+<!-- ===== Intake ===== -->
+<div class="abs title" style="left:282px;top:390px;width:100px;text-align:center;font-size:24px">Intake</div>
+<div class="abs node lg" style="left:280px;top:430px"><svg class="ic lg"><use href="#refresh"/></svg></div>
+<div class="abs lbl" style="left:246px;top:540px;width:170px"><b>Clean and fence</b>trim, limit length,<br>strip look-alike tags</div>
+
+<!-- ===== Scoring engine (code) ===== -->
+<div class="abs dash code" style="left:470px;top:230px;width:470px;height:260px"></div>
+<div class="abs box-h" style="left:492px;top:244px"><i class="dot" style="background:var(--code)"></i>Scoring engine<small>explainable code, not an LLM</small></div>
+<div class="abs item" style="left:493px;top:292px"><svg class="ic"><use href="#bars"/></svg>Budget fit<br>vs market price</div>
+<div class="abs item" style="left:600px;top:292px"><svg class="ic"><use href="#wallet"/></svg>Funds ready<br>loan or cash</div>
+<div class="abs item" style="left:706px;top:292px"><svg class="ic"><use href="#clock"/></svg>Timeline<br>how soon</div>
+<div class="abs item" style="left:813px;top:292px"><svg class="ic"><use href="#target"/></svg>Clear need<br>area, size, why</div>
+<div class="abs item" style="left:493px;top:372px"><svg class="ic"><use href="#home"/></svg>Buying intent<br>visits, questions</div>
+<div class="abs item" style="left:600px;top:372px"><svg class="ic"><use href="#people"/></svg>Decision maker<br>who decides</div>
+<div class="abs item" style="left:706px;top:372px"><svg class="ic"><use href="#eye"/></svg>Time since reply<br>quiet lowers it</div>
+<div class="abs item" style="left:813px;top:372px"><svg class="ic"><use href="#phone"/></svg>Logged calls<br>visits raise it</div>
+<div class="abs foot-line" style="left:470px;top:456px;width:470px"><span class="dot" style="background:var(--hot);width:8px;height:8px"></span> Hot 70+ &nbsp;·&nbsp; <span class="dot" style="background:var(--store);width:8px;height:8px"></span> Warm 40-69 &nbsp;·&nbsp; <span class="dot" style="background:var(--ai);width:8px;height:8px"></span> Cold under 40 &nbsp;·&nbsp; spam: Disqualified</div>
+
+<!-- ===== Safety and reliability ===== -->
+<div class="abs dash" style="left:470px;top:520px;width:470px;height:164px"></div>
+<div class="abs box-h" style="left:492px;top:533px"><i class="dot" style="background:var(--ink)"></i>Safety and reliability</div>
+<div class="abs item" style="left:493px;top:577px"><svg class="ic"><use href="#shield"/></svg>Text fenced<br>as data</div>
+<div class="abs item" style="left:600px;top:577px"><svg class="ic"><use href="#alert"/></svg>Injection<br>warning</div>
+<div class="abs item" style="left:706px;top:577px"><svg class="ic"><use href="#doccheck"/></svg>Facts<br>range-checked</div>
+<div class="abs item" style="left:813px;top:577px"><svg class="ic"><use href="#refresh"/></svg>Save first,<br>Re-analyze</div>
+<div class="abs foot-line" style="left:470px;top:656px;width:470px">stray links removed &nbsp;·&nbsp; model fallback &nbsp;·&nbsp; plain-language errors</div>
+
+<!-- ===== Storage ===== -->
+<div class="abs dash store" style="left:470px;top:708px;width:470px;height:100px"></div>
+<div class="abs item" style="left:493px;top:726px;width:130px"><svg class="ic" style="stroke:var(--store)"><use href="#db"/></svg>Firestore<br>leads</div>
+<div class="abs item" style="left:640px;top:726px;width:130px"><svg class="ic" style="stroke:var(--store)"><use href="#list"/></svg>Version record<br>cheap list refresh</div>
+<div class="abs item" style="left:787px;top:726px;width:130px"><svg class="ic" style="stroke:var(--store)"><use href="#zap"/></svg>Answer cache<br>reuses answers</div>
+
+<!-- ===== What you get ===== -->
+<div class="abs title" style="left:1040px;top:205px">What you get</div>
+<div class="abs dash card" style="left:1040px;top:245px;width:270px;height:92px"><svg class="ic lg"><use href="#flag"/></svg><div><b>Priority card</b><span><i style="background:var(--hot)"></i>Hot <i style="background:var(--store)"></i>Warm <i style="background:var(--ai)"></i>Cold, with the reasons</span></div></div>
+<div class="abs dash card" style="left:1040px;top:355px;width:270px;height:92px"><svg class="ic lg"><use href="#target"/></svg><div><b>Next action</b><span>what to do, when, and why</span></div></div>
+<div class="abs dash card" style="left:1040px;top:465px;width:270px;height:92px"><svg class="ic lg"><use href="#send"/></svg><div><b>Suggested reply</b><span>copy it, or open it in WhatsApp</span></div></div>
+<div class="abs dash card" style="left:1040px;top:575px;width:270px;height:92px"><svg class="ic lg"><use href="#chat"/></svg><div><b>Chat about the lead</b><span>answers from that lead's own details</span></div></div>
+
+<!-- ===== Also in the app ===== -->
+<div class="abs title" style="left:1350px;top:205px;font-size:24px">Also in the app</div>
+<div class="abs dash soft" style="left:1350px;top:245px;width:210px;height:520px;border-radius:30px"></div>
+<div class="abs node" style="left:1421px;top:262px"><svg class="ic"><use href="#clock"/></svg></div>
+<div class="abs lbl" style="left:1360px;top:336px;width:190px"><b>Today's calls</b>best order, red timers</div>
+<div class="abs node" style="left:1421px;top:384px"><svg class="ic"><use href="#phone"/></svg></div>
+<div class="abs lbl" style="left:1360px;top:458px;width:190px"><b>Log call</b>score updates live</div>
+<div class="abs node" style="left:1421px;top:506px"><svg class="ic"><use href="#kanban"/></svg></div>
+<div class="abs lbl" style="left:1360px;top:580px;width:190px"><b>Pipeline</b>drag across stages</div>
+<div class="abs node" style="left:1421px;top:628px"><svg class="ic"><use href="#flag"/></svg></div>
+<div class="abs lbl" style="left:1360px;top:702px;width:190px"><b>Change priority</b>with a reason</div>
+
+<div class="abs" style="left:40px;top:828px;font-weight:800;font-size:15px;color:var(--ink)">Tech stack</div>
+<div class="abs" style="left:40px;top:856px;width:242px;height:50px;border:1.5px dashed var(--line);border-radius:12px;background:#fff;padding:8px 14px;box-sizing:border-box"><div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)">Browser</div><div style="font-size:13px;font-weight:600;color:var(--ink);margin-top:2px;white-space:nowrap">plain HTML · CSS · JavaScript</div></div>
+<div class="abs" style="left:296px;top:856px;width:242px;height:50px;border:1.5px dashed var(--line);border-radius:12px;background:#fff;padding:8px 14px;box-sizing:border-box"><div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)">API</div><div style="font-size:13px;font-weight:600;color:var(--ink);margin-top:2px;white-space:nowrap">Python · Flask</div></div>
+<div class="abs" style="left:551px;top:856px;width:242px;height:50px;border:1.5px dashed var(--line);border-radius:12px;background:#fff;padding:8px 14px;box-sizing:border-box"><div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ai)">AI</div><div style="font-size:13px;font-weight:600;color:var(--ink);margin-top:2px;white-space:nowrap">Gemini 3.5 Flash-Lite</div></div>
+<div class="abs" style="left:807px;top:856px;width:242px;height:50px;border:1.5px dashed var(--line);border-radius:12px;background:#fff;padding:8px 14px;box-sizing:border-box"><div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--code)">Scoring</div><div style="font-size:13px;font-weight:600;color:var(--ink);margin-top:2px;white-space:nowrap">rules.py, plain Python</div></div>
+<div class="abs" style="left:1063px;top:856px;width:242px;height:50px;border:1.5px dashed var(--line);border-radius:12px;background:#fff;padding:8px 14px;box-sizing:border-box"><div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--store)">Storage</div><div style="font-size:13px;font-weight:600;color:var(--ink);margin-top:2px;white-space:nowrap">Firebase Firestore</div></div>
+<div class="abs" style="left:1318px;top:856px;width:242px;height:50px;border:1.5px dashed var(--line);border-radius:12px;background:#fff;padding:8px 14px;box-sizing:border-box"><div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)">Tests</div><div style="font-size:13px;font-weight:600;color:var(--ink);margin-top:2px;white-space:nowrap">unittest · jsdom</div></div>
+
+<!-- ===== Footer ===== -->
+<div class="abs" style="left:40px;top:930px;display:flex;align-items:center;gap:16px"><div style="width:64px;height:64px;border-radius:17px;border:2px solid var(--line);background:#fff;display:grid;place-items:center"><span style="width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#14B8A6,#2563EB)"></span></div><div><div style="font-weight:800;font-size:30px;color:var(--ink);line-height:1.1">Lead Desk</div><div style="font-size:13px;color:var(--muted);margin-top:3px">System architecture · AI lead prioritisation for salespeople</div></div></div>
+<div class="abs legend" style="right:40px;top:952px"><span><i class="dot" style="background:var(--ai)"></i>AI</span><span><i class="dot" style="background:var(--code)"></i>Plain code</span><span><i class="dot" style="background:var(--store)"></i>Storage</span></div>
+
+</body>
+</html>
